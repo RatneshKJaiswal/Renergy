@@ -14,7 +14,8 @@ TARGET_MODELS = [
     "../models/Other_System(t)_model.json",
     "../models/Refrigeration_Energy(t)_model.json",
     "../models/Solar_Available_for_Use(t)_model.json",
-    "../models/Total_Energy(t)_model.json"
+    "../models/Total_Energy(t)_model.json",
+    "../models/Base_Consumption_Loads(t)_model.json"
 ]
 
 TARGET_NAMES = [
@@ -27,7 +28,8 @@ TARGET_NAMES = [
     "Other_System(t)",
     "Refrigeration_Energy(t)",
     "Solar_Available_for_Use(t)",
-    "Total_Energy(t)"
+    "Total_Energy(t)",
+    "Base_Consumption_Loads(t)"
 ]
 
 def generate_features(forecast_horizon_hours: int) -> pd.DataFrame:
@@ -56,8 +58,10 @@ def generate_forecast(forecast_horizon_hours: int) -> List[Dict[str, Any]]:
     forecast = []
     for i in range(forecast_horizon_hours):
         forecast.append({
-            "timestamp": timestamps[i].replace(minute=0, second=0, microsecond=0, tzinfo=None).strftime("%Y-%m-%d %H:%M:%S"),
-            **{target: round(float(predictions[target][i]), 7) if (target == "Electricity_Price(t)" or predictions[target][i] >= 1) else 0 for target in TARGET_NAMES}
+            "timestamp": timestamps[i].replace(minute=0, second=0, microsecond=0).isoformat(),
+            **{target: round(float(predictions[target][i]), 7) if (
+                        target == "Electricity_Price(t)" or predictions[target][i] >= 1) else 0 for target in
+               TARGET_NAMES}
         })
     return forecast
 
